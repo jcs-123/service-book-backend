@@ -9,9 +9,9 @@ const Servicebook = express();
 Servicebook.use(cors());
 Servicebook.use(express.json());
 
-// ✅ Serve uploaded files
-Servicebook.use('/uploads', express.static(path.join(__dirname, 'upload')));
 
+// ✅ Static file serving (core fix)
+Servicebook.use("/uploads", express.static(path.join(__dirname, "uploads")));
 // ✅ Mount the router
 Servicebook.use('/', router);
 
