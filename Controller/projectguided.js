@@ -134,3 +134,39 @@ exports.deleteProjectGuided = async (req, res) => {
     });
   }
 };
+
+exports.getAllProjectsGuided = async (req, res) => {
+  console.log("\n🟢 /api/projectsguided/get called");
+
+  try {
+    // Fetch all records excluding unwanted fields
+    const projects = await ProjectGuided.find({}, { _id: 0, __v: 0, createdAt: 0, updatedAt: 0 });
+
+    // Rename keys for better readability
+    const formattedProjects = projects.map((p) => ({
+      "Project / Research Name": p.name || "",
+      Gmail: p.email || "",
+      "During Academic Year": p.academicYear || "",
+      "Is Funded": p.isFunded || "",
+      "Funded Agency": p.fundedAgency || "",
+      "Co Investigator": p.coInvestigator || "",
+      Level: p.level || "",
+    }));
+
+    console.log(`✅ ${formattedProjects.length} Project(s) fetched successfully`);
+
+    res.status(200).json({
+      success: true,
+      count: formattedProjects.length,
+      data: formattedProjects,
+    });
+  } catch (err) {
+    console.error("❌ Error fetching ProjectGuided data:", err.message);
+    res.status(500).json({
+      success: false,
+      message: "Server error fetching Project Guided data",
+      error: err.message,
+    });
+  }
+};
+

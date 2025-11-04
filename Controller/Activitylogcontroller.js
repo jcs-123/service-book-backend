@@ -143,3 +143,44 @@ exports.deleteActivity = async (req, res) => {
     });
   }
 };
+
+exports.getAllActivityLogs = async (req, res) => {
+  console.log("\n🟢 /api/activitylog/get called");
+
+  try {
+    // Fetch all activity logs excluding system fields
+    const logs = await ActivityLog.find(
+      {},
+      { _id: 0, __v: 0, createdAt: 0, updatedAt: 0 }
+    );
+
+    // 🧠 Format and rename keys for clarity
+    const formattedData = logs.map((log) => ({
+      Gmail: log.gmail || "",
+      "Activity Title": log.title || "",
+      "During Academic Year": log.academicYear || "",
+      "From Date": log.fromDate
+        ? new Date(log.fromDate).toLocaleDateString("en-GB")
+        : "",
+      "To Date": log.toDate
+        ? new Date(log.toDate).toLocaleDateString("en-GB")
+        : "",
+      "Cost (₹)": log.cost ? `₹${log.cost}` : "",
+    }));
+
+    console.log(`✅ ${formattedData.length} activity log record(s) fetched successfully`);
+
+    res.status(200).json({
+      success: true,
+      count: formattedData.length,
+      data: formattedData,
+    });
+  } catch (err) {
+    console.error("❌ Error fetching activity logs:", err.message);
+    res.status(500).json({
+      success: false,
+      message: "Server error fetching activity logs",
+      error: err.message,
+    });
+  }
+};

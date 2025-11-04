@@ -130,3 +130,39 @@ exports.deleteConsultancy = async (req, res) => {
     });
   }
 };
+exports.getAllConsultancy = async (req, res) => {
+  console.log("\n🟢 /api/consultancy/get called");
+
+  try {
+    // Fetch all consultancy projects and exclude system fields
+    const consultancies = await Consultancy.find(
+      {},
+      { _id: 0, __v: 0, createdAt: 0, updatedAt: 0 }
+    );
+
+    // 🧠 Format data with renamed keys for frontend / Excel readability
+    const formattedData = consultancies.map((c) => ({
+      Gmail: c.email || "",
+      Title: c.title || "",
+      "Organised By": c.organisedBy || "",
+      "During Academic Year": c.academicYear || "",
+      "Is Funded": c.isFunded || "",
+      "Fund Amount (₹)": c.fundAmount ? `₹${c.fundAmount}` : "",
+    }));
+
+    console.log(`✅ ${formattedData.length} consultancy record(s) fetched successfully`);
+
+    res.status(200).json({
+      success: true,
+      count: formattedData.length,
+      data: formattedData,
+    });
+  } catch (err) {
+    console.error("❌ Error fetching consultancy data:", err.message);
+    res.status(500).json({
+      success: false,
+      message: "Server error fetching consultancy data",
+      error: err.message,
+    });
+  }
+};

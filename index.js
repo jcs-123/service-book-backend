@@ -9,11 +9,6 @@ const Servicebook = express();
 Servicebook.use(cors());
 Servicebook.use(express.json());
 
-<<<<<<< HEAD
-// ✅ Serve uploaded files
-Servicebook.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-=======
->>>>>>> f5637e4d2c2dff689d9a23c242d1a1bea2bdac2c
 
 // ✅ Static file serving (core fix)
 Servicebook.use("/uploads", express.static(path.join(__dirname, "uploads")));

@@ -156,3 +156,47 @@ exports.deleteExperience = async (req, res) => {
     });
   }
 };
+
+exports.getAllExperiences = async (req, res) => {
+  console.log("\n🟢 /api/experience/get called");
+
+  try {
+    const BASE_URL = process.env.BASE_URL || "http://localhost:4000";
+
+    // Fetch all experiences and exclude system fields
+    const experiences = await Experience.find({}, { _id: 0, __v: 0, createdAt: 0, updatedAt: 0 });
+
+    // 🧠 Map & rename fields + format for Excel
+    const formatted = experiences.map((exp) => {
+      const fileURL = exp.certificate ? `${BASE_URL}/uploads/${exp.certificate}` : "";
+      const viewLink = fileURL ? `=HYPERLINK("${fileURL}", "View File")` : "";
+
+      return {
+        Gmail: exp.email || "",
+        "Project / Work Title": exp.title || "",
+        Organization: exp.organization || "",
+        "From Date": exp.fromDate || "",
+        "To Date": exp.toDate || "",
+        Designation: exp.designation || "",
+        "Nature of Employment": exp.employmentNature || "",
+        "Nature of Duty": exp.dutyNature || "",
+        Certificate: viewLink, // ✅ Clickable Excel link
+      };
+    });
+
+    console.log(`✅ ${formatted.length} Experience record(s) fetched successfully`);
+
+    res.status(200).json({
+      success: true,
+      count: formatted.length,
+      data: formatted,
+    });
+  } catch (err) {
+    console.error("❌ Error fetching experiences:", err.message);
+    res.status(500).json({
+      success: false,
+      message: "Server error fetching experiences",
+      error: err.message,
+    });
+  }
+};
