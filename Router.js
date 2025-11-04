@@ -1,26 +1,18 @@
 const express = require("express");
 const router = express.Router();
-<<<<<<< HEAD
 const path = require("path");
 const multer = require("multer");
 
 // ====================================================
 // ⚙️  MULTER CONFIGURATION (for file uploads)
 // ====================================================
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, "./uploads"),
-  filename: (req, file, cb) =>
-    cb(null, Date.now() + "-" + file.originalname.replace(/\s+/g, "_")),
-});
-const upload = multer({ storage });
+
 
 // ====================================================
 // 🔐 AUTHENTICATION ROUTES
 // ====================================================
 const logincontroller = require("./Controller/logincontroller");
 
-=======
-const logincontroller = require("./Controller/logincontroller");
 const qualification = require("./Controller/qualificationcontroller");
 const upload = require("./config/multerConfig"); // ✅ use the multer config file
 const experiencecontroller = require("./Controller/experiencecontrolelr");
@@ -36,7 +28,6 @@ const profectionalbodymembership = require("./Controller/profectionalbodycontrol
 
 
 /* ====================== LOGIN ROUTES ====================== */
->>>>>>> f5637e4d2c2dff689d9a23c242d1a1bea2bdac2c
 router.post("/register", logincontroller.registerUser);
 router.post("/login", logincontroller.loginUser);
 router.get("/", logincontroller.getAllUsers);
@@ -45,7 +36,6 @@ router.post("/verify-otp", logincontroller.verifyOtp);
 router.post("/reset-password", logincontroller.resetPassword);
 router.put("/change-password", logincontroller.changePassword);
 
-<<<<<<< HEAD
 // ====================================================
 // 📋 GENERAL DETAILS ROUTES
 // ====================================================
@@ -66,12 +56,10 @@ router.put("/api/general-details/:id", updateGeneralDetails);
 // ====================================================
 const subjectEngagedController = require("./Controller/subjectEngagedController");
 
-router.post(
-  "/subjects-engaged",
-  subjectEngagedController.createOrUpdateSubjects
-);
-router.get("/subjects-engaged", subjectEngagedController.getSubjectsByUserId);
+router.post("/subjects-engaged", subjectEngagedController.createOrUpdateSubjects);
+router.get("/subjects-engaged", subjectEngagedController.getSubjectsByGmail);
 router.get("/all-subjects-engaged", subjectEngagedController.getAllSubjects);
+
 
 // ====================================================
 // 📰 PUBLICATIONS (PDF / IMAGE UPLOAD)
@@ -232,7 +220,6 @@ router.delete("/api/mooc/:id", moocController.deleteMooc);
 // ====================================================
 // ✅ EXPORT ROUTER
 // ====================================================
-=======
 /* =================== QUALIFICATION ROUTES ================== */
 router.post("/qualification", upload.single("certificate"), qualification.addQualification);
 router.get("/qualification/:email", qualification.getQualificationsByEmail);
@@ -299,5 +286,4 @@ module.exports = router;
 
 
 
->>>>>>> f5637e4d2c2dff689d9a23c242d1a1bea2bdac2c
 module.exports = router;
