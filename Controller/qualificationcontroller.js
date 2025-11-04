@@ -168,3 +168,51 @@ exports.deleteQualification = async (req, res) => {
     });
   }
 };
+
+exports.getAllQualifications = async (req, res) => {
+  console.log("\n🟢 /api/qualifications/get called");
+
+  try {
+    const BASE_URL = process.env.BASE_URL || "http://localhost:4000";
+
+    const qualifications = await Qualification.find(
+      {},
+      { _id: 0, __v: 0, createdAt: 0, updatedAt: 0 }
+    );
+
+    const formattedQualifications = qualifications.map((q) => {
+      // 🧠 Full link to file if available
+      const fileURL = q.certificate ? `${BASE_URL}/uploads/${q.certificate}` : "";
+
+      // 🧩 Excel formula for clickable link
+      const viewLink = fileURL ? `=HYPERLINK("${fileURL}", "View File")` : "";
+
+      return {
+        Gmail: q.email || "",
+        Degree: q.degree || "",
+        Discipline: q.discipline || "",
+        University: q.university || "",
+        Percentage: q.percentage || "",
+        "Registration Year": q.registrationYear || "",
+        "Passing Year": q.passingYear || "",
+        Remarks: q.remarks || "",
+        Certificate: viewLink, // ✅ Clickable “View File” in Excel
+      };
+    });
+
+    console.log(`✅ ${formattedQualifications.length} Qualification record(s) fetched successfully`);
+
+    res.status(200).json({
+      success: true,
+      count: formattedQualifications.length,
+      data: formattedQualifications,
+    });
+  } catch (err) {
+    console.error("❌ Error fetching qualifications:", err.message);
+    res.status(500).json({
+      success: false,
+      message: "Server error fetching qualifications",
+      error: err.message,
+    });
+  }
+};

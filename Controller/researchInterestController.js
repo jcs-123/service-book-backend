@@ -54,3 +54,36 @@ exports.deleteInterest = async (req, res) => {
     res.status(500).json({ success: false, message: "Server Error", error: err.message });
   }
 };
+
+exports.getAllResearchInterests = async (req, res) => {
+  console.log("\n🟢 /api/researchinterest/get called");
+
+  try {
+    // Fetch all research interests excluding system fields
+    const interests = await ResearchInterest.find(
+      {},
+      { _id: 0, __v: 0, createdAt: 0, updatedAt: 0 }
+    );
+
+    // 🧠 Format data for readability / Excel export
+    const formattedData = interests.map((i) => ({
+      Gmail: i.gmail || "",
+      "Research Interest Title": i.title || "",
+    }));
+
+    console.log(`✅ ${formattedData.length} research interest record(s) fetched successfully`);
+
+    res.status(200).json({
+      success: true,
+      count: formattedData.length,
+      data: formattedData,
+    });
+  } catch (err) {
+    console.error("❌ Error fetching research interests:", err.message);
+    res.status(500).json({
+      success: false,
+      message: "Server error fetching research interests",
+      error: err.message,
+    });
+  }
+};

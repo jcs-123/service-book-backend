@@ -142,3 +142,37 @@ exports.deleteWork = async (req, res) => {
     });
   }
 };
+
+exports.getAllAdministrativeWork = async (req, res) => {
+  console.log("\n🟢 /api/administrativework/get called");
+
+  try {
+    // Fetch all records excluding system fields
+    const works = await AdministrativeWork.find(
+      {},
+      { _id: 0, __v: 0, createdAt: 0, updatedAt: 0 }
+    );
+
+    // 🧠 Format and rename fields for readability / Excel
+    const formattedData = works.map((w) => ({
+      Gmail: w.gmail || "",
+      "Name of Work / Responsibility": w.nameOfWork || "",
+      "During Academic Year": w.academicYear || "",
+    }));
+
+    console.log(`✅ ${formattedData.length} administrative work record(s) fetched successfully`);
+
+    res.status(200).json({
+      success: true,
+      count: formattedData.length,
+      data: formattedData,
+    });
+  } catch (err) {
+    console.error("❌ Error fetching administrative work:", err.message);
+    res.status(500).json({
+      success: false,
+      message: "Server error fetching administrative work",
+      error: err.message,
+    });
+  }
+};

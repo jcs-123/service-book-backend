@@ -149,3 +149,35 @@ exports.deleteSubject = async (req, res) => {
     });
   }
 };
+exports.getAllInterestedSubjects = async (req, res) => {
+  console.log("\n🟢 /api/interestedsubjects/get called");
+
+  try {
+    // Fetch all subjects, excluding MongoDB system fields
+    const subjects = await InterestedSubject.find(
+      {},
+      { _id: 0, __v: 0, createdAt: 0, updatedAt: 0 }
+    );
+
+    // 🧠 Format data for readability / Excel export
+    const formattedData = subjects.map((s) => ({
+      Gmail: s.gmail || "",
+      "Interested Subject": s.title || "",
+    }));
+
+    console.log(`✅ ${formattedData.length} interested subject record(s) fetched successfully`);
+
+    res.status(200).json({
+      success: true,
+      count: formattedData.length,
+      data: formattedData,
+    });
+  } catch (err) {
+    console.error("❌ Error fetching interested subjects:", err.message);
+    res.status(500).json({
+      success: false,
+      message: "Server error fetching interested subjects",
+      error: err.message,
+    });
+  }
+};

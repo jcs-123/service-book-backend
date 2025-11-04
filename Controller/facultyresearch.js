@@ -128,3 +128,44 @@ exports.deleteFacultyResearch = async (req, res) => {
       .json({ success: false, message: "Server error", error: err.message });
   }
 };
+
+exports.getAllFacultyResearch = async (req, res) => {
+  console.log("\n🟢 /api/facultyresearch/get called");
+
+  try {
+    const BASE_URL = process.env.BASE_URL || "http://localhost:4000";
+
+    // Fetch all records and exclude system fields
+    const researchList = await FacultyResearch.find(
+      {},
+      { _id: 0, __v: 0, createdAt: 0, updatedAt: 0 }
+    );
+
+    // 🧠 Format and rename fields for Excel/export readability
+    const formattedResearch = researchList.map((r) => ({
+      Gmail: r.email || "",
+      "Title / Research Topic": r.title || "",
+      "Is Collaborative": r.isCollaborative || "",
+      Collaborator: r.collaborator || "",
+      "During Academic Year": r.academicYear || "",
+      "Is Funded": r.isFunded || "",
+      Status: r.status || "",
+      "Fund Amount (₹)": r.fundAmount ? `₹${r.fundAmount}` : "",
+    }));
+
+    console.log(`✅ ${formattedResearch.length} Faculty Research record(s) fetched successfully`);
+
+    res.status(200).json({
+      success: true,
+      count: formattedResearch.length,
+      data: formattedResearch,
+    });
+  } catch (err) {
+    console.error("❌ Error fetching faculty research:", err.message);
+    res.status(500).json({
+      success: false,
+      message: "Server error fetching faculty research",
+      error: err.message,
+    });
+  }
+};

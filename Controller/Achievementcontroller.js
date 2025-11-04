@@ -124,3 +124,38 @@ exports.deleteAchievement = async (req, res) => {
     });
   }
 };
+
+exports.getAllAchievements = async (req, res) => {
+  console.log("\n🟢 /api/achievements/get called");
+
+  try {
+    // Fetch all achievements, excluding internal fields
+    const achievements = await Achievement.find(
+      {},
+      { _id: 0, __v: 0, createdAt: 0, updatedAt: 0 }
+    );
+
+    // 🧠 Format for frontend/Excel readability
+    const formattedData = achievements.map((a) => ({
+      Gmail: a.gmail || "",
+      "Achievement Title": a.title || "",
+      "During Academic Year": a.academicYear || "",
+      Remarks: a.remarks || "",
+    }));
+
+    console.log(`✅ ${formattedData.length} achievement record(s) fetched successfully`);
+
+    res.status(200).json({
+      success: true,
+      count: formattedData.length,
+      data: formattedData,
+    });
+  } catch (err) {
+    console.error("❌ Error fetching achievements:", err.message);
+    res.status(500).json({
+      success: false,
+      message: "Server error fetching achievements",
+      error: err.message,
+    });
+  }
+};
