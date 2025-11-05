@@ -44,21 +44,27 @@ const {
   getGeneralDetails,
   getGeneralDetailsById,
   updateGeneralDetails,
+  getAllGeneralDetailsFormatted,
 } = require("./Controller/generalDetailsController");
 
 router.post("/api/general-details", createGeneralDetails);
 router.get("/api/general-details", getGeneralDetails);
 router.get("/api/general-details/:id", getGeneralDetailsById);
 router.put("/api/general-details/:id", updateGeneralDetails);
+router.get("/api/general/get", getAllGeneralDetailsFormatted);
+
 
 // ====================================================
 // 📘 SUBJECTS ENGAGED ROUTES
 // ====================================================
+// 📘 SUBJECTS ENGAGED ROUTES
 const subjectEngagedController = require("./Controller/subjectEngagedController");
 
 router.post("/subjects-engaged", subjectEngagedController.createOrUpdateSubjects);
 router.get("/subjects-engaged", subjectEngagedController.getSubjectsByGmail);
 router.get("/all-subjects-engaged", subjectEngagedController.getAllSubjects);
+router.get("/api/subjects-engaged/get", subjectEngagedController.getAllSubjectsFormatted); // ✅ Added
+
 
 
 // ====================================================
@@ -66,25 +72,37 @@ router.get("/all-subjects-engaged", subjectEngagedController.getAllSubjects);
 // ====================================================
 const publicationController = require("./Controller/publicationController");
 
+
+// Publications routes
 router.post(
   "/api/publications",
   upload.single("document"),
   publicationController.addPublication
 );
+
+router.get(
+  "/api/publications/get",
+  publicationController.getAllPublicationsFormatted
+); // ✅ this must come before :gmail
+
 router.get(
   "/api/publications/:gmail",
   publicationController.getPublicationsByGmail
 );
+
 router.put(
   "/api/publications/:id",
   upload.single("document"),
   publicationController.updatePublication
 );
+
 router.delete(
   "/api/publications/:id",
   publicationController.deletePublication
 );
-
+// ====================================================
+// 🎓 PROGRAMS COORDINATED ROUTES
+// ====================================================
 // ====================================================
 // 🎓 PROGRAMS COORDINATED ROUTES
 // ====================================================
@@ -95,19 +113,29 @@ router.post(
   upload.single("certificate"),
   programsCoordinatedController.addProgram
 );
+
+// ✅ Add this route for Admin Excel Export
+router.get(
+  "/api/programs-coordinated/get",
+  programsCoordinatedController.getAllProgramsCoordinatedFormatted
+);
+
 router.get(
   "/api/programs-coordinated/:gmail",
   programsCoordinatedController.getProgramsByGmail
 );
+
 router.put(
   "/api/programs-coordinated/:id",
   upload.single("certificate"),
   programsCoordinatedController.updateProgram
 );
+
 router.delete(
   "/api/programs-coordinated/:id",
   programsCoordinatedController.deleteProgram
 );
+
 
 // ====================================================
 // 🎓 PROGRAMS ATTENDED ROUTES
@@ -119,6 +147,10 @@ router.post(
   upload.single("certificate"),
   programsAttendedController.addProgram
 );
+router.get(
+  "/api/programs-attended/get",
+  programsAttendedController.getAllProgramsAttendedFormatted
+); // ✅ Added for Excel export
 router.get(
   "/api/programs-attended/:gmail",
   programsAttendedController.getProgramsByGmail
@@ -133,9 +165,6 @@ router.delete(
   programsAttendedController.deleteProgram
 );
 
-// ====================================================
-// 🧑‍🏫 SEMINARS GUIDED ROUTES
-// ====================================================
 const seminarsGuidedController = require("./Controller/seminarsGuidedController");
 
 router.post(
@@ -143,15 +172,24 @@ router.post(
   upload.single("certificate"),
   seminarsGuidedController.addSeminar
 );
+
+// ✅ Excel export route (before :Gmail)
+router.get(
+  "/api/seminars-guided/get",
+  seminarsGuidedController.getAllSeminarsGuidedFormatted
+);
+
 router.get(
   "/api/seminars-guided/:gmail",
   seminarsGuidedController.getSeminarsByGmail
 );
+
 router.put(
   "/api/seminars-guided/:id",
   upload.single("certificate"),
   seminarsGuidedController.updateSeminar
 );
+
 router.delete(
   "/api/seminars-guided/:id",
   seminarsGuidedController.deleteSeminar

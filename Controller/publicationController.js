@@ -71,3 +71,59 @@ exports.updatePublication = async (req, res) => {
     res.status(500).json({ success: false, message: "Error updating publication", error });
   }
 };
+
+exports.getAllPublicationsFormatted = async (req, res) => {
+  console.log("🟢 /api/publications/get called");
+
+  try {
+    const BASE_URL = process.env.BASE_URL || "http://localhost:4000";
+
+    const publications = await Publication.find(
+      {},
+      { _id: 0, __v: 0, createdAt: 0, updatedAt: 0 }
+    );
+
+    if (!publications.length) {
+      return res.status(404).json({
+        success: false,
+        message: "No publication records found ❌",
+      });
+    }
+
+    const formattedPublications = publications.map((p, index) => {
+      const fileURL = p.document ? `${BASE_URL}/uploads/${p.document}` : "";
+      const viewLink = fileURL ? `=HYPERLINK("${fileURL}", "View File")` : "";
+
+      return {
+        "No.": index + 1,
+        Gmail: p.gmail || "",
+        Category: p.category || "",
+        Title: p.title || "",
+        "Name of Publication": p.nameOfPublication || "",
+        "Patent No": p.patentNo || "",
+        Indexing: p.indexing || "",
+        "Academic Year": p.academicYear || "",
+        Date: p.date
+          ? new Date(p.date).toLocaleDateString("en-GB")
+          : "",
+        Period: p.period || "",
+        Document: viewLink,
+      };
+    });
+
+    console.log(`✅ ${formattedPublications.length} publication(s) formatted successfully`);
+
+    res.status(200).json({
+      success: true,
+      count: formattedPublications.length,
+      data: formattedPublications,
+    });
+  } catch (err) {
+    console.error("❌ Error fetching formatted publications:", err.message);
+    res.status(500).json({
+      success: false,
+      message: "Server error fetching publications",
+      error: err.message,
+    });
+  }
+};

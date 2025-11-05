@@ -79,3 +79,50 @@ exports.deleteSeminar = async (req, res) => {
     res.status(500).json({ success: false, message: "Error deleting seminar" });
   }
 };
+// ======================================================
+// 📊 FORMATTED SEMINARS GUIDED DATA (for Admin Excel Export)
+// ======================================================
+exports.getAllSeminarsGuidedFormatted = async (req, res) => {
+  console.log("\n🟢 /api/seminars-guided/get called");
+  try {
+    const BASE_URL = process.env.BASE_URL || "http://localhost:4000";
+
+    // Fetch all seminars (hide internal fields)
+    const seminars = await SeminarsGuided.find(
+      {},
+      { __v: 0, createdAt: 0, updatedAt: 0 }
+    );
+
+    // Map to Excel-friendly format
+    const formatted = seminars.map((s, i) => {
+      const fileURL = s.certificate ? `${BASE_URL}${s.certificate}` : "";
+      const viewLink = fileURL ? `=HYPERLINK("${fileURL}", "View File")` : "";
+
+      return {
+        "Sl No": i + 1,
+        Gmail: s.gmail || "",
+        Category: s.category || "",
+        Title: s.title || "",
+        Programme: s.programme || "",
+        Batch: s.batch || "",
+        "Student Name": s.studentName || "",
+        "Roll No": s.rollNo || "",
+        "Academic Year": s.academicYear || "",
+        Certificate: viewLink,
+      };
+    });
+
+    res.status(200).json({
+      success: true,
+      count: formatted.length,
+      data: formatted,
+    });
+  } catch (error) {
+    console.error("❌ Error fetching formatted seminars:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error fetching seminars guided",
+      error: error.message,
+    });
+  }
+};

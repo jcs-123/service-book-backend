@@ -67,3 +67,49 @@ exports.getAllSubjects = async (req, res) => {
     res.status(500).json({ success: false, message: "Internal server error", error: error.message });
   }
 };
+/* ======================================================
+   📊 FORMATTED SUBJECT ENGAGED DATA (for admin table/export)
+====================================================== */
+exports.getAllSubjectsFormatted = async (req, res) => {
+  console.log("\n🟢 /api/subjects-engaged/get called");
+
+  try {
+    const allRecords = await SubjectEngaged.find({}, { __v: 0, createdAt: 0, updatedAt: 0 });
+
+    const formattedData = [];
+
+    allRecords.forEach((record, index) => {
+      if (record.subjects && Array.isArray(record.subjects)) {
+        record.subjects.forEach((subject, i) => {
+          formattedData.push({
+            "No": formattedData.length + 1,
+            "Gmail": record.gmail || "",
+            "Academic Year": subject.academicYear || "",
+            "Batch": subject.batch || "",
+            "Semester": subject.semester || "",
+            "Subject": subject.subjectCode
+              ? `${subject.subjectCode} - ${subject.subjectName}`
+              : subject.subjectName || "",
+            "Course Diary": subject.courseDiary || "Not Uploaded",
+            "Pass %": subject.passPercentage || "—",
+          });
+        });
+      }
+    });
+
+    console.log(`✅ ${formattedData.length} subject(s) formatted successfully`);
+
+    res.status(200).json({
+      success: true,
+      count: formattedData.length,
+      data: formattedData,
+    });
+  } catch (error) {
+    console.error("❌ Error fetching formatted subjects:", error.message);
+    res.status(500).json({
+      success: false,
+      message: "Server error fetching formatted subjects",
+      error: error.message,
+    });
+  }
+};

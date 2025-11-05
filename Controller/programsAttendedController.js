@@ -151,3 +151,54 @@ exports.deleteProgram = async (req, res) => {
     });
   }
 };
+
+// ======================================================
+// 📊 FORMATTED PROGRAMS ATTENDED DATA (for Admin Excel Export)
+// ======================================================
+exports.getAllProgramsAttendedFormatted = async (req, res) => {
+  console.log("\n🟢 /api/programs-attended/get called");
+
+  try {
+    const BASE_URL = process.env.BASE_URL || "http://localhost:4000";
+
+    // Fetch all programs without internal fields
+    const programs = await ProgramsAttended.find(
+      {},
+      { __v: 0, createdAt: 0, updatedAt: 0 }
+    );
+
+    // Format data for Excel or admin view
+    const formatted = programs.map((p, index) => {
+      const fileURL = p.certificate ? `${BASE_URL}${p.certificate}` : "";
+      const viewLink = fileURL ? `=HYPERLINK("${fileURL}", "View File")` : "";
+
+      return {
+        "Sl No": index + 1,
+        "Gmail": p.gmail || "",
+        "Category": p.category || "",
+        "Sub Category": p.subCategory || "",
+        "Title": p.title || "",
+        "Period": p.period || "",
+        "Funding Agency": p.fundingAgency || "",
+        "Organised By": p.organisedBy || "",
+        "From Date": p.fromDate ? new Date(p.fromDate).toLocaleDateString("en-GB") : "",
+        "To Date": p.toDate ? new Date(p.toDate).toLocaleDateString("en-GB") : "",
+        "Certificate": viewLink,
+      };
+    });
+
+    console.log(`✅ ${formatted.length} program(s) formatted successfully`);
+    res.status(200).json({
+      success: true,
+      count: formatted.length,
+      data: formatted,
+    });
+  } catch (error) {
+    console.error("❌ Error fetching formatted programs:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error fetching programs",
+      error: error.message,
+    });
+  }
+};

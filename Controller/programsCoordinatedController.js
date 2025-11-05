@@ -133,3 +133,57 @@ exports.deleteProgram = async (req, res) => {
     });
   }
 };
+
+
+// ======================================================
+// 📊 FORMATTED PROGRAMS COORDINATED DATA (for Admin Excel Export)
+// ======================================================
+exports.getAllProgramsCoordinatedFormatted = async (req, res) => {
+  console.log("\n🟢 /api/programs-coordinated/get called");
+
+  try {
+    const BASE_URL = process.env.BASE_URL || "http://localhost:4000";
+
+    const programs = await ProgramsCoordinated.find(
+      {},
+      { __v: 0, createdAt: 0, updatedAt: 0 }
+    );
+
+    const formatted = programs.map((p, index) => {
+      const fileURL = p.certificate ? `${BASE_URL}${p.certificate}` : "";
+      const viewLink = fileURL ? `=HYPERLINK("${fileURL}", "View File")` : "";
+
+      return {
+        "Sl No": index + 1,
+        "Gmail": p.gmail || "",
+        "Title": p.title || "",
+        "Category": p.category || "",
+        "Organised By": p.organisedBy || "",
+        "From Date": p.fromDate
+          ? new Date(p.fromDate).toLocaleDateString("en-GB")
+          : "",
+        "To Date": p.toDate
+          ? new Date(p.toDate).toLocaleDateString("en-GB")
+          : "",
+        "Academic Year": p.academicYear || "",
+        "Certificate": viewLink,
+      };
+    });
+
+    console.log(`✅ ${formatted.length} program(s) formatted successfully`);
+
+    res.status(200).json({
+      success: true,
+      count: formatted.length,
+      data: formatted,
+    });
+  } catch (error) {
+    console.error("❌ Error fetching formatted coordinated programs:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error fetching programs coordinated",
+      error: error.message,
+    });
+  }
+};
+
