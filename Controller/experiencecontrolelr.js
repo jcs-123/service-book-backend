@@ -161,7 +161,7 @@ exports.getAllExperiences = async (req, res) => {
   console.log("\n🟢 /api/experience/get called");
 
   try {
-    const BASE_URL = process.env.BASE_URL || "http://localhost:4000";
+    const BASE_URL = process.env.BASE_URL || "https://service-book-backend.onrender.com";
 
     // Fetch all experiences and exclude system fields
     const experiences = await Experience.find({}, { _id: 0, __v: 0, createdAt: 0, updatedAt: 0 });

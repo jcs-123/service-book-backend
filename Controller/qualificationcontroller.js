@@ -173,7 +173,7 @@ exports.getAllQualifications = async (req, res) => {
   console.log("\n🟢 /api/qualifications/get called");
 
   try {
-    const BASE_URL = process.env.BASE_URL || "http://localhost:4000";
+    const BASE_URL = process.env.BASE_URL || "https://service-book-backend.onrender.com";
 
     const qualifications = await Qualification.find(
       {},
