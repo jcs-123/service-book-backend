@@ -124,3 +124,37 @@ exports.deleteMembership = async (req, res) => {
     });
   }
 };
+
+/* ======================================================
+   📊 FORMATTED DATA FOR ADMIN EXCEL EXPORT
+====================================================== */
+exports.getAllMembershipsFormatted = async (req, res) => {
+  console.log("\n🟢 /api/professional-body/get called");
+
+  try {
+    const memberships = await ProfessionalBodyMembership.find({}, { __v: 0, createdAt: 0, updatedAt: 0 });
+
+    const formatted = memberships.map((m, index) => ({
+      "Sl No": index + 1,
+      "Name of Professional Body": m.bodyName || "",
+      "Type of Membership": m.type || "",
+      "Membership ID": m.memberId || "",
+      "Member Since": m.memberSince || "",
+      Description: m.description || "",
+    }));
+
+    console.log(`✅ ${formatted.length} membership record(s) formatted successfully`);
+    res.status(200).json({
+      success: true,
+      count: formatted.length,
+      data: formatted,
+    });
+  } catch (error) {
+    console.error("❌ Error fetching formatted memberships:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error fetching memberships",
+      error: error.message,
+    });
+  }
+};

@@ -62,3 +62,46 @@ exports.deleteInteraction = async (req, res) => {
     res.status(500).json({ success: false, message: "Error deleting interaction" });
   }
 };
+
+// ======================================================
+// 🌍 FORMATTED INTERACTIONS DATA (for Admin Excel Export)
+// ======================================================
+exports.getAllInteractionsFormatted = async (req, res) => {
+  console.log("\n🟢 /api/interactions/get called");
+
+  try {
+    const BASE_URL = process.env.BASE_URL || "http://localhost:4000";
+
+    const interactions = await Interactions.find(
+      {},
+      { __v: 0, createdAt: 0, updatedAt: 0 }
+    );
+
+    const formatted = interactions.map((i, index) => {
+      const fileURL = i.certificate ? `${BASE_URL}${i.certificate}` : "";
+      const viewLink = fileURL ? `=HYPERLINK("${fileURL}", "View File")` : "";
+
+      return {
+        "Sl No": index + 1,
+        Gmail: i.gmail || "",
+        Title: i.title || "",
+        "Academic Year": i.academicYear || "",
+        Certificate: viewLink,
+      };
+    });
+
+    console.log(`✅ ${formatted.length} interaction(s) formatted successfully`);
+    res.status(200).json({
+      success: true,
+      count: formatted.length,
+      data: formatted,
+    });
+  } catch (error) {
+    console.error("❌ Error fetching formatted interactions:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error fetching interactions",
+      error: error.message,
+    });
+  }
+};

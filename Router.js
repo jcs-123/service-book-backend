@@ -164,6 +164,9 @@ router.delete(
   "/api/programs-attended/:id",
   programsAttendedController.deleteProgram
 );
+// ====================================================
+// 🎓 SEMINAR GUIDED ROUTES
+// ====================================================
 
 const seminarsGuidedController = require("./Controller/seminarsGuidedController");
 
@@ -198,6 +201,7 @@ router.delete(
 // ====================================================
 // 🌍 INTERACTIONS WITH OUTSIDE WORLD ROUTES
 // ====================================================
+
 const interactionsController = require("./Controller/interactionsController");
 
 router.post(
@@ -205,12 +209,21 @@ router.post(
   upload.single("certificate"),
   interactionsController.addInteraction
 );
+
+// ✅ Excel export route (must come before :gmail)
+router.get(
+  "/api/interactions/get",
+  interactionsController.getAllInteractionsFormatted
+);
+
 router.get("/api/interactions/:gmail", interactionsController.getByGmail);
+
 router.put(
   "/api/interactions/:id",
   upload.single("certificate"),
   interactionsController.updateInteraction
 );
+
 router.delete("/api/interactions/:id", interactionsController.deleteInteraction);
 
 // ====================================================
@@ -219,9 +232,14 @@ router.delete("/api/interactions/:id", interactionsController.deleteInteraction)
 const positionsController = require("./Controller/positionsController");
 
 router.post("/api/positions", positionsController.addPosition);
+
+// ✅ Excel export route (before :gmail)
+router.get("/api/positions/get", positionsController.getAllPositionsFormatted);
+
 router.get("/api/positions/:gmail", positionsController.getPositionsByGmail);
 router.put("/api/positions/:id", positionsController.updatePosition);
 router.delete("/api/positions/:id", positionsController.deletePosition);
+
 
 // ====================================================
 // 🧠 RESEARCH INTERESTS ROUTES
@@ -233,15 +251,23 @@ router.get("/api/research-interests/:gmail", researchInterestController.getInter
 router.put("/api/research-interests/:id", researchInterestController.updateInterest);
 router.delete("/api/research-interests/:id", researchInterestController.deleteInterest);
 router.get("/api/reserach/get", researchInterestController.getAllResearchInterests);
+
+
 // ====================================================
 // 💡 PATENT ROUTES
 // ====================================================
 const patentController = require("./Controller/patentController");
 
 router.post("/api/patents", patentController.addPatent);
+
+// ✅ Excel Export Route (must come before :gmail)
+router.get("/api/patents/get", patentController.getAllPatentsFormatted);
+
 router.get("/api/patents/:gmail", patentController.getPatentsByGmail);
 router.put("/api/patents/:id", patentController.updatePatent);
 router.delete("/api/patents/:id", patentController.deletePatent);
+
+
 
 
 // ====================================================
@@ -250,9 +276,14 @@ router.delete("/api/patents/:id", patentController.deletePatent);
 const moocController = require("./Controller/moocController");
 
 router.post("/api/mooc", moocController.addMooc);
+
+// ✅ Excel export route (must come before :gmail)
+router.get("/api/mooc/get", moocController.getAllMoocFormatted);
+
 router.get("/api/mooc/:gmail", moocController.getMoocsByGmail);
 router.put("/api/mooc/:id", moocController.updateMooc);
 router.delete("/api/mooc/:id", moocController.deleteMooc);
+
 
 
 // ====================================================
@@ -322,7 +353,8 @@ router.post("/addmembership", profectionalbodymembership.addMembership);
 router.get("/getmemberships/:gmail", profectionalbodymembership.getMemberships);
 router.put("/updatemembership/:id", profectionalbodymembership.updateMembership);
 router.delete("/deletemembership/:id", profectionalbodymembership.deleteMembership);
-module.exports = router;
+router.get("/api/professional-body/get", profectionalbodymembership.getAllMembershipsFormatted);
+
 
 
 

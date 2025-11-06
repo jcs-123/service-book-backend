@@ -58,3 +58,47 @@ exports.deletePosition = async (req, res) => {
     res.status(500).json({ success: false, message: "Error deleting position" });
   }
 };
+
+
+// ======================================================
+// 🏛️ FORMATTED POSITIONS HELD DATA (for Admin Excel Export)
+// ======================================================
+exports.getAllPositionsFormatted = async (req, res) => {
+  console.log("\n🟢 /api/positions/get called");
+
+  try {
+    const positions = await Positions.find(
+      {},
+      { __v: 0, createdAt: 0, updatedAt: 0 }
+    );
+
+    const formatted = positions.map((p, index) => ({
+      "Sl No": index + 1,
+      Gmail: p.gmail || "",
+      Position: p.position || "",
+      "Academic Year": p.academicYear || "",
+      Period: p.period || "",
+      "Start Date": p.startDate
+        ? new Date(p.startDate).toLocaleDateString("en-GB")
+        : "",
+      "End Date": p.endDate
+        ? new Date(p.endDate).toLocaleDateString("en-GB")
+        : "",
+    }));
+
+    console.log(`✅ ${formatted.length} position record(s) formatted successfully`);
+
+    res.status(200).json({
+      success: true,
+      count: formatted.length,
+      data: formatted,
+    });
+  } catch (error) {
+    console.error("❌ Error fetching formatted positions:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error fetching positions",
+      error: error.message,
+    });
+  }
+};
