@@ -1,4 +1,4 @@
-const Mooc = require("../Model/moocModel");
+const Mooc = require("../model/moocModel");
 
 /* ======================================================
    ➕ ADD MOOC COURSE
